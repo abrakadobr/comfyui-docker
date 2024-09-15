@@ -1,0 +1,60 @@
+version: "3.8"
+name: comfy-docker
+services:
+
+  comfy:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    stop_signal: SIGKILL
+    restart: always
+    tty: true
+    environment:
+      - CLI_ARGS=
+    ports:
+      - "7870:7870"
+    volumes:
+      - comfy_cache:/home/comfy/.cache
+      - comfy_models:/home/comfy/comfyui/models
+      - comfy_custom_nodes:/home/comfy/comfyui/custom_nodes
+      - comfy_input:/home/comfy/comfyui/input
+      - comfy_output:/home/comfy/comfyui/output
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [compute, utility]
+
+volumes:
+  comfy_cache:
+    driver: local
+    driver_opts: 
+      o: bind
+      type: none
+      device: ./data/cache
+  comfy_models:
+    driver: local
+    driver_opts: 
+      o: bind
+      type: none
+      device: ./data/models
+  comfy_custom_nodes:
+    driver: local
+    driver_opts: 
+      o: bind
+      type: none
+      device: ./data/custom_nodes
+  comfy_input:
+    driver: local
+    driver_opts: 
+      o: bind
+      type: none
+      device: ./data/input
+  comfy_output:
+    driver: local
+    driver_opts: 
+      o: bind
+      type: none
+      device: ./data/output
